@@ -1,0 +1,403 @@
+---
+title: "Evidencia 2 | Proyecto integrador"
+output:
+word_document: default
+pdf_document: default
+---
+Escuela: Tecnologico de Monterrey
+
+Materia: Análisis de biología computacional (Gpo 513)
+
+Alumno: Renet de Jesús Pérez Gómez
+
+Codigo: A01640555
+
+Parte 1 - Video 1
+
+Liga directa a video
+
+https://drive.google.com/file/d/1oUbun_TX_2tx70kU5VgJl-q00z5WaCOD/view?usp=sharing
+
+Parte 2 - Video 2
+
+Exportamos librerias
+```{r}
+library(seqinr)
+library(ggplot2)
+library(ggthemes)
+library(Biostrings)
+library(adegenet)
+library(ape)
+library(ggtree)
+library(DECIPHER)
+library(viridis)
+```
+
+Indicaciones
+1-Analizar las secuencias de SARS-CoV-2 reportadas en los 20 países con más casos
+  reportados. Y puedes tratar de responder a la pregunta: ¿Son muy diferentes las
+  variantes entre cada país? ¿Es diferente el SARS-CoV-2 entre las diferentes 
+  poblaciones: Asiática, Hispana, Europea o Africana?
+
+Exportamos datos
+```{r}
+setwd("C:/Users/RENET/Documents/TEC DE MONTERREY/Semestre 2/Modulo 2/Biologia computacional/entregable_2/variantes");
+cov_USA<-read.fasta("1sequence USA.fasta");
+cov_IND<-read.fasta("2sequenceIND.fasta");
+cov_BRA<-read.fasta("3sequenceBRA.fasta");
+cov_FRA<-read.fasta("4sequenceFRA.fasta");
+cov_RUS<-read.fasta("5sequenceRUS.fasta");
+cov_TUR<-read.fasta("6sequenceTUR.fasta");
+cov_END<-read.fasta("7sequence END.fasta");
+cov_ITA<-read.fasta("8sequence ITA.fasta");
+cov_ESP<-read.fasta("9sequenceESP.fasta");
+cov_DEU<-read.fasta("10sequenceDEU.fasta");
+cov_ARG<-read.fasta("11sequenceARG.fasta");
+cov_POLEN<-read.fasta("12sequencePOLEN.fasta");
+cov_COL<-read.fasta("13sequenceCOL.fasta");
+cov_IRN<-read.fasta("14sequenceIRN.fasta");
+cov_MEX<-read.fasta("15sequenceMEX.fasta");
+cov_PER<-read.fasta("16sequencePER.fasta");
+cov_CZE<-read.fasta("17sequenceCZE.fasta");
+cov_ZFA<-read.fasta("18sequenceZFA.fasta");
+cov_NLD<-read.fasta("19sequenceNLD.fasta");
+cov_CHL<-read.fasta("20sequenceCHL.fasta");
+```
+
+
+2-Calcula la longitud de las secuencias que incluyas.
+
+
+```{r}
+#Calculamos longitud de cada cepa
+l_cov_USA <- length(cov_USA[[1]])
+l_cov_IND <- length(cov_IND[[1]])
+l_cov_BRA <- length(cov_BRA[[1]])
+l_cov_FRA <- length(cov_FRA[[1]])
+l_cov_RUS <- length(cov_RUS[[1]])
+l_cov_TUR <- length(cov_TUR[[1]])
+l_cov_END <- length(cov_END[[1]])
+l_cov_ITA <- length(cov_ITA[[1]])
+l_cov_ESP <- length(cov_ESP[[1]])
+l_cov_DEU <- length(cov_DEU[[1]])
+l_cov_ARG <- length(cov_ARG[[1]])
+l_cov_POLEN <- length(cov_POLEN[[1]])
+l_cov_COL <- length(cov_COL[[1]])
+l_cov_IRN <- length(cov_IRN[[1]])
+l_cov_MEX <- length(cov_MEX[[1]])
+l_cov_PER <- length(cov_PER[[1]])
+l_cov_CZE <- length(cov_CZE[[1]])
+l_cov_ZFA <- length(cov_ZFA[[1]])
+l_cov_NLD <- length(cov_NLD[[1]])
+l_cov_CHL <- length(cov_CHL[[1]])
+
+L<-"Longitudes de las secuencias"
+A<-"(Ordenado del pais mas infectado al menos infectado)"
+tablaInfoLong <- data.frame(Pais=rep(c('USA','IND','BRA','FRA','RUS',
+                                       'TUR','END','ITA','ESP','DEU',
+                                       'ARG','POL','COL','IRN','MEX',
+                                       'PER','CZE','ZFA','NLD','CHL')),
+                            Longuitud=rep(c(as.vector(l_cov_USA),
+                                            as.vector(l_cov_IND),
+                                            as.vector(l_cov_BRA),
+                                            as.vector(l_cov_FRA),
+                                            as.vector(l_cov_RUS),
+                                            as.vector(l_cov_TUR),
+                                            as.vector(l_cov_END),
+                                            as.vector(l_cov_ITA),
+                                            as.vector(l_cov_ESP),
+                                            as.vector(l_cov_DEU),
+                                            as.vector(l_cov_ARG),
+                                            as.vector(l_cov_POLEN),
+                                            as.vector(l_cov_COL),
+                                            as.vector(l_cov_IRN),
+                                            as.vector(l_cov_MEX),
+                                            as.vector(l_cov_PER),
+                                            as.vector(l_cov_CZE),
+                                            as.vector(l_cov_ZFA),
+                                            as.vector(l_cov_NLD),
+                                            as.vector(l_cov_CHL)
+                                            )))
+L
+A
+tablaInfoLong
+```
+3-Crea una sola gráfica donde se comparen el número de bases de ADN que componen todas las variantes del virus. 
+
+
+```{r}
+numBases <- 4
+#Creamos conjuntos
+datos1 <- data.frame( bases=rep(c('A', 'C', 'G', 'T'), times=6), 
+virus=c(rep("USA", times=numBases), 
+        rep("IND", times=numBases),
+        rep("BRA", times=numBases), 
+        rep("FRA", times=numBases), 
+        rep("RUS", times=numBases),
+        rep("TUR", times=numBases)
+        ), 
+tots=c(as.vector(table(cov_USA)), 
+       as.vector(table(cov_IND)),
+       as.vector(table(cov_BRA)),
+       as.vector(table(cov_FRA)),
+       as.vector(table(cov_RUS)),
+       as.vector(table(cov_TUR))
+       ));
+head(datos1)
+str(datos1)
+
+datos2 <- data.frame( bases=rep(c('A', 'C', 'G', 'T'), times=6), 
+virus=c(rep("END", times=numBases),
+        rep("ITA", times=numBases),
+        rep("ESP", times=numBases),
+        rep("DEU", times=numBases),
+        rep("ARG", times=numBases),
+        rep("POL", times=numBases)
+        ), 
+tots=c(as.vector(table(cov_END)),
+       as.vector(table(cov_ITA)),
+       as.vector(table(cov_ESP)),
+       as.vector(table(cov_DEU)),
+       as.vector(table(cov_ARG)),
+       as.vector(table(cov_POLEN))
+       ));
+head(datos2)
+str(datos2)
+
+datos3 <- data.frame( bases=rep(c('A', 'C', 'G', 'T'), times=8), 
+virus=c(rep("COL", times=numBases),
+        rep("IRN", times=numBases),
+        rep("MEX", times=numBases),
+        rep("PER", times=numBases),
+        rep("CZE", times=numBases),
+        rep("ZFA", times=numBases),
+        rep("NLD", times=numBases),
+        rep("CHL", times=numBases)
+        ), 
+tots=c(as.vector(table(cov_COL)),
+       as.vector(table(cov_IRN)),
+       as.vector(table(cov_MEX)),
+       as.vector(table(cov_PER)),
+       as.vector(table(cov_CZE)),
+       as.vector(table(cov_ZFA)),
+       as.vector(table(cov_NLD)),
+       as.vector(table(cov_CHL))
+       ));
+head(datos3)
+str(datos3)
+
+#Graficamos
+p1 <- ggplot(datos1, aes(x=bases, y=tots, fill=virus)) + geom_bar(stat = "identity")  + facet_grid(~virus) + scale_fill_brewer(palette = "Greens") + ggtitle("Comparación de bases de variantes de Covid-19 de 20 paises (1/3)") + labs(x="Bases", y="Total de bases", fill="Virus") + theme_dark()
+
+p2 <- ggplot(datos2, aes(x=bases, y=tots, fill=virus)) + geom_bar(stat = "identity")  + facet_grid(~virus) + scale_fill_brewer(palette = "Blues") + ggtitle("Comparación de bases de variantes de Covid-19 de 20 paises (2/3)") + labs(x="Bases", y="Total de bases", fill="Virus") + theme_dark()
+
+p3 <- ggplot(datos3, aes(x=bases, y=tots, fill=virus)) + geom_bar(stat = "identity")  + facet_grid(~virus) + scale_fill_brewer(palette = "Oranges") + ggtitle("Comparación de bases de variantes de Covid-19 de 20 paises (3/3)") + labs(x="Bases", y="Total de bases", fill="Virus") + theme_dark()
+
+#Imprimimos graficas
+p1
+p2
+p3
+```
+
+4-Agrega un análisis jerárquico global obtenido de las secuencias que se seleccionaron para estudiar.
+
+```{r}
+#Creamos un vector con todas las variantes de coronavirus
+varaintes_covid <- c("MW989374","MT416726","MT844030","MW322968","MW332241",
+                     "MW306667","MW059036","MW789246","MW976781","MW822593",
+                     "MW633908","MT511082","MT470219","MT994881","MW595908",
+                     "MT263074","MT517433","MT324062","MW577029","MW064264")
+
+#Solicitamos a la base de datos
+variantes_secuencias <- read.GenBank(varaintes_covid)
+
+#Concatenamos en un mismo archivo todas las secuencias y guardamos en un ".fasta"
+write.dna(variantes_secuencias,  file ="covid-variantes.fasta", format = "fasta", 
+          append = FALSE, nbcol = 6, colsep = " ", colw = 10)
+
+#Recuperamos la informacion del ".fasta" que creamos
+varaintes_secuencias_no_alineadas <- readDNAStringSet("covid-variantes.fasta", 
+                                                      format = "fasta")
+
+#Comenzamos proceso de alineacion de secuencias
+varaintes_secuencias_no_alineadas <- OrientNucleotides(varaintes_secuencias_no_alineadas)
+
+varaintes_secuencias_alineadas <- AlignSeqs(varaintes_secuencias_no_alineadas)
+BrowseSeqs(varaintes_secuencias_alineadas, highlight=0)
+
+#Guradamos el resultado de aliniacion en un ".fasta."
+writeXStringSet(varaintes_secuencias_alineadas, file="variantes_secuencias_alineadas.fasta")
+
+#Extraemos
+varaintes_secuencias_alineadas <- read.alignment("variantes_secuencias_alineadas.fasta", format = "fasta")
+
+#Creamos una matriz de distancia, la cual nos ayudara a hacer el arbol
+matriz_distancia <- dist.alignment(varaintes_secuencias_alineadas, matrix = "similarity")
+
+#Creamos arbol
+virus_tree <- nj(matriz_distancia)
+class(virus_tree) 
+
+virus_tree <- ladderize(virus_tree)
+
+#Graficamos arbol
+plot(virus_tree, cex = 0.6)
+title("Arbol filogenetico de las variantes SARS-CoV-2")
+
+L<-"Variante que pertenece a:"
+A<-"(Ordenado del pais mas infectado al menos infectado)"
+tablaInfo <- data.frame(
+      Pais=rep(c('USA','IND','BRA','FRA','RUS',
+                 'TUR','END','ITA','ESP','DEU',
+                 'ARG','POL','COL','IRN','MEX',
+                 'PER','CZE','ZFA','NLD','CHL')),
+      Variante=rep(c("MW989374","MT416726","MT844030","MW322968","MW332241",
+                     "MW306667","MW059036","MW789246","MW976781","MW822593",
+                     "MW633908","MT511082","MT470219","MT994881","MW595908",
+                     "MT263074","MT517433","MT324062","MW577029","MW064264")))
+L
+A
+tablaInfo
+
+at <-c('USA','IND','BRA','FRA','RUS',
+                 'TUR','END','ITA','ESP','DEU',
+                 'ARG','POL','COL','IRN','MEX',
+                 'PER','CZE','ZFA','NLD','CHL')
+at2 <- c("MW989374","MT416726","MT844030","MW322968","MW332241",
+                     "MW306667","MW059036","MW789246","MW976781","MW822593",
+                     "MW633908","MT511082","MT470219","MT994881","MW595908",
+                     "MT263074","MT517433","MT324062","MW577029","MW064264")
+```
+
+5-Agrega una interpretación escrita de tus gráficas y tus conclusiones según el 
+caso de estudio que seleccionaste. 
+
+-Intepretación y conlución de las graficas- 
+Podemos analizar en el grafico de barras que las variantes del coronavirus 
+no varian mucho a nivel genomico, graficamente podemos ver que son practicamete
+lo mismo, sin embargo, esto nos puede ayudar a corroborar que todas las 
+secuencias analizadas se tratan de la misma especie.
+
+Donde se logra ver la diferencia entre las variantes de Covid-19 es en el arbol 
+filogenetico, es lógico que mute en los diferentes paises ya que presentan 
+diferentes condiciones para el virus, sumado a que por su "relativa" simplicidad
+genomica lo hace muy supsetible a mutaciones, esto puede explicar su gran 
+cantidad de variación en tan poco tiempo.
+
+De hecho, para sustentar lo anterior cito textualmente:
+"Las infecciones virales son las enfermedades infecciosas más 
+frecuentes y son desencadenantes habituales de los principales daños 
+socioeconómicos y de salud", 
+(Meo, A. S. (2020), https://doi.org/10.1016/j.ijbiomac.2020.12.142)
+
+Analizando mas profundamente el arbol filogenetico encontramos que las variantes
+mas proximas entre si se tienden a juntar geograficamente, siendo mas marcada 
+la tendencia en europa, muy probablemente por la facilidad de viajar de un pais
+a otro.
+
+Hay dos casos particulares que se me hacen bastante interesantes, el primero es
+con la variante MW989374 de USA, principalmente a que a pesar de ser un pais 
+tan importante, existe una variante tan distante a otras, aunque se puede 
+explicar esto ya lleva tiempo siendo el foco de la enfermedad.
+
+
+En segundo lugar esta el caso de México, con la variante MW595908, a pesar de
+ser bastante un pais vecino del foco de la enfermedad hay muchisima diferencia 
+con esta, y que de hecho es una con una taxonomia bastante independiente al 
+resto de las cepas, realmente no me explico el porque de esta situación.
+
+En conclución, puedo decir que esta clase de analisis es bastante 
+importante ya que nos ayudan a comprender la naturaleza de la enfermedad, y el
+peligro que puede suponer la alta tasa de mutabilidad del virus, citando. 
+
+Arguemntando el planteamiento anterior, cito textualmente el siguiente articulo:
+"Se sabe que incluso mutaciones únicas en proteínas específicas pueden cambiar 
+la patogenicidad de estos virus" (Bianchi, M., Borsetti, A., Ciccozzi, 
+M., & Pascarella, S. (2021), introducción-parrafo 2, https://doi.org/10.1016/j.ijbiomac.2020.12.142).
+
+Recuperando el segundo caso que expuse, si el virus se aleja bastante de 
+la familia principal puede suponer un gran problema para mexico ya que aumenta 
+la posibilidad que cuando salga una futura vacuna, esta no sea efectiva. 
+
+Es por ello que cobra mucho sentido las medidas preventivas ya que mientras mas
+expandida este la enfermedad mas posibilidades hay de que esta se vuelva mas 
+compleja de resolver (hablando desde todos los puntos de vista, desde 
+los economico y sociales, hasta los biologicos).
+
+
+Bibliografía
+
+```{r}
+#Librerias utilizadas para hacer el proyecto:
+
+citation( package =  "seqinr")
+citation( package =  "ggplot2")
+citation( package =  "ggthemes")
+citation( package =  "Biostrings")
+citation( package =  "adegenet")
+citation( package =  "ape")
+citation( package =  "ggtree")
+citation( package =  "DECIPHER")
+citation( package =  "viridis")
+
+```
+
+Liga directa para descargar a las secuencias genomicas, todas descargadas del
+NCBI:
+
+-USA / MW989374 / Severe acute respiratory syndrome coronavirus 2 isolate   SARS-CoV-2/human/USA/IL-CDC-QDX23613929/2021, complete genome
+
+-IND / MT416726 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/IND/8004/2020, complete genome
+
+-BRA / MT844030 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/BRA/RJ-DCVN4/2020, complete genome
+
+-FRA / MW322968 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/FRA/FRA_WGS157/2020, complete genome
+
+-RUS / MW332241 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/RUS/5473/2020, complete genome
+
+-TUR / MW306667 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/TUR/ETLKVET2/2020, complete genome
+
+-END / MW059036 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/England/2/2020, complete genome"
+
+-ITA / MW789246 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/ITA/20H-501Y.V2/2021, complete genome
+
+-ESP / MW976781 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/ESP/DDG80_Rota_11/2021, complete genome
+
+-DEU / MW822593 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/DEU/FFM-BRA1/2021, complete genome
+
+-ARG / MW633908 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/ARG/Cordoba-919/2020, complete genome
+
+-POL / MT511082 /  Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/POL/PL_P26/2020, complete genome
+
+-COL / MT470219 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/COL/Cali-01/2020, complete genome
+
+-IRN / MT994881 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/IRN/COVID19-IRVSH6/2020, complete genome
+
+-MEX / MW595908 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/MEX/CICESE-BC5/2020, complete genome
+
+-PER / MT263074 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/PER/Peru-10/2020, complete genome
+
+-CZE / MT517433 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/CZE/IAB_22/2020, complete genome
+
+-ZFA / MT324062 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/ZAF/R03006/2020, complete genome
+
+-NLD / MW577029 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/human/NLD/Nijmegen1/2020, complete genome
+
+-CHL / MW064264 / Severe acute respiratory syndrome coronavirus 2 isolate SARS-CoV-2/Cat/CHL/UCH_NRL_025/2020, complete genome
+
+Articulos consultados para la realización de este trabajo:
+
+-Bianchi, M., Borsetti, A., Ciccozzi, M., & Pascarella, S. (2021). 
+SARS-Cov-2 ORF3a: Mutability and function. International journal of biological 
+macromolecules, 170, 820–826. https://doi.org/10.1016/j.ijbiomac.2020.12.142
+
+-Meo, S. A., Al-Khlaiwi, T., Usmani, A. M., Meo, A. S., Klonoff, D. C., & 
+Hoang, T. D. (2020). Biological and epidemiological trends in the prevalence and
+mortality due to outbreaks of novel coronavirus COVID-19. Journal of King Saud 
+University. Science, 32(4), 2495–2499. https://doi.org/10.1016/j.jksus.2020.04.004
+
+-Oulas A, Zanti M, Tomazou M, Zachariou M, Minadakis G, Bourdakou MM, 
+Pavlidis P, Spyrou GM. Generalized linear models provide a measure of virulence 
+for specific mutations in SARS-CoV-2 strains. PLoS One. 
+2021 Jan 26;16(1):e0238665. doi: 10.1371/journal.pone.0238665. 
+PMID: 33497392; PMCID: PMC7837476.
